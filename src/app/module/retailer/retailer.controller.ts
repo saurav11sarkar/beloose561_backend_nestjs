@@ -7,12 +7,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import AuthGuard from '../../middlewares/auth.guard';
 import { CreateRetailerDto } from './dto/create-retailer.dto';
 import { RetailerService } from './retailer.service';
 
+@ApiTags('retailer')
 @Controller('retailer')
 export class RetailerController {
   constructor(private readonly retailerService: RetailerService) {}

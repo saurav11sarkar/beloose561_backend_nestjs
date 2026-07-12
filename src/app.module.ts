@@ -16,6 +16,7 @@ import { HumidorModule } from './app/module/humidor/humidor.module';
 import { ShelfModule } from './app/module/shelf/shelf.module';
 import { InventoryModule } from './app/module/inventory/inventory.module';
 import { QrcodesModule } from './app/module/qrcodes/qrcodes.module';
+import { MasterDatabaseModule } from './app/module/master-database/master-database.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { QrcodesModule } from './app/module/qrcodes/qrcodes.module';
     ShelfModule,
     InventoryModule,
     QrcodesModule,
+    MasterDatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
