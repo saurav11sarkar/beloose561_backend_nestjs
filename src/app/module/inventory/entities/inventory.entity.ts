@@ -112,6 +112,19 @@ export class Inventory {
 
   @Prop()
   lastSoldDate!: Date;
+
+  // Inventory Opportunities - Discount
+  @Prop({ default: false })
+  isOnDiscount!: boolean;
+
+  @Prop({ min: 0, max: 100 })
+  discountPercentage!: number;
+
+  @Prop({ min: 0 })
+  discountPrice!: number;
+
+  @Prop()
+  discountedAt!: Date;
 }
 
 export const InventorySchema = SchemaFactory.createForClass(Inventory);

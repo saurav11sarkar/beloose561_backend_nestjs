@@ -28,6 +28,8 @@ import { fileUpload } from '../../helpers/fileUploder';
 import pick from '../../helpers/pick';
 import AuthGuard from '../../middlewares/auth.guard';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
+import { DiscountInventoryDto } from './dto/discount-inventory.dto';
+import { FeatureInventoryDto } from './dto/feature-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { InventoryService } from './inventory.service';
 
@@ -93,6 +95,60 @@ export class InventoryController {
       message: 'Inventory retrieved successfully',
       meta: result.meta,
       data: result.data,
+    };
+  }
+
+  @Get('/opportunities/my')
+  @ApiOperation({
+    summary:
+      'Get "Inventory Opportunities" - cigars with no sale (and/or no customer search) in the given window',
+  })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @ApiQuery({
+    name: 'days',
+    type: 'number',
+    required: false,
+    description: 'Lookback window in days (default 90)',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getInventoryOpportunities(@Req() req: Request) {
+    const days = req.query.days ? Number(req.query.days) : undefined;
+    const result = await this.inventoryService.getInventoryOpportunities(
+      req.user!.id,
+      days,
+    );
+
+    return {
+      message: 'Inventory opportunities retrieved successfully',
+      data: result,
+    };
+  }
+
+  @Get('/opportunities/summary/my')
+  @ApiOperation({
+    summary:
+      'Dashboard widget - count of cigars needing attention (Inventory Opportunities)',
+  })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @ApiQuery({
+    name: 'days',
+    type: 'number',
+    required: false,
+    description: 'Lookback window in days (default 90)',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getInventoryOpportunitiesSummary(@Req() req: Request) {
+    const days = req.query.days ? Number(req.query.days) : undefined;
+    const result = await this.inventoryService.getInventoryOpportunitiesSummary(
+      req.user!.id,
+      days,
+    );
+
+    return {
+      message: 'Inventory opportunities summary retrieved successfully',
+      data: result,
     };
   }
 
@@ -298,6 +354,62 @@ export class InventoryController {
 
     return {
       message: 'Inventory status updated successfully',
+      data: result,
+    };
+  }
+
+  @Patch(':id/feature')
+  @ApiOperation({
+    summary: '⭐ Feature It - mark a cigar as Staff Pick / Daily Featured',
+  })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.OK)
+  async featureInventory(
+    @Param('id') id: string,
+    @Body() featureInventoryDto: FeatureInventoryDto,
+  ) {
+    const result = await this.inventoryService.featureInventory(
+      id,
+      featureInventoryDto,
+    );
+
+    return {
+      message: 'Inventory marked as featured successfully',
+      data: result,
+    };
+  }
+
+  @Patch(':id/discount')
+  @ApiOperation({ summary: '💰 Discount It - apply a % discount to a cigar' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.OK)
+  async applyDiscount(
+    @Param('id') id: string,
+    @Body() discountInventoryDto: DiscountInventoryDto,
+  ) {
+    const result = await this.inventoryService.applyDiscount(
+      id,
+      discountInventoryDto,
+    );
+
+    return {
+      message: 'Discount applied successfully',
+      data: result,
+    };
+  }
+
+  @Patch(':id/discount/remove')
+  @ApiOperation({ summary: 'Remove an active discount from a cigar' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.OK)
+  async removeDiscount(@Param('id') id: string) {
+    const result = await this.inventoryService.removeDiscount(id);
+
+    return {
+      message: 'Discount removed successfully',
       data: result,
     };
   }
