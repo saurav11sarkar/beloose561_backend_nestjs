@@ -27,10 +27,12 @@ import type { Request } from 'express';
 import { fileUpload } from '../../helpers/fileUploder';
 import pick from '../../helpers/pick';
 import AuthGuard from '../../middlewares/auth.guard';
+import { AddStaffPickDto } from './dto/add-staff-pick.dto';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { DiscountInventoryDto } from './dto/discount-inventory.dto';
 import { FeatureInventoryDto } from './dto/feature-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { UpdateStaffPickDto } from './dto/update-staff-pick.dto';
 import { InventoryService } from './inventory.service';
 
 @ApiTags('inventory')
@@ -152,6 +154,20 @@ export class InventoryController {
     };
   }
 
+  @Get('/staff-picks/my')
+  @ApiOperation({ summary: 'Get my retailer current Staff Picks' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.OK)
+  async getMyStaffPicks(@Req() req: Request) {
+    const result = await this.inventoryService.getMyStaffPicks(req.user!.id);
+
+    return {
+      message: 'Staff picks retrieved successfully',
+      data: result,
+    };
+  }
+
   @Get('/')
   @ApiOperation({ summary: 'Get all admin inventory list' })
   @ApiBearerAuth('access-token')
@@ -266,6 +282,20 @@ export class InventoryController {
       message: 'Inventory retrieved successfully',
       meta: result.meta,
       data: result.data,
+    };
+  }
+
+  @Get(':slug/staff-picks')
+  @ApiOperation({
+    summary: "Customer App - get a store's Staff Picks (public)",
+  })
+  @HttpCode(HttpStatus.OK)
+  async getStaffPicksByStore(@Param('slug') slug: string) {
+    const result = await this.inventoryService.getStaffPicksByStore(slug);
+
+    return {
+      message: 'Staff picks retrieved successfully',
+      data: result,
     };
   }
 
@@ -410,6 +440,60 @@ export class InventoryController {
 
     return {
       message: 'Discount removed successfully',
+      data: result,
+    };
+  }
+
+  @Post(':id/staff-pick')
+  @ApiOperation({ summary: 'Add Staff Pick - mark an inventory item' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.CREATED)
+  async addStaffPick(
+    @Param('id') id: string,
+    @Body() addStaffPickDto: AddStaffPickDto,
+  ) {
+    const result = await this.inventoryService.addStaffPick(
+      id,
+      addStaffPickDto,
+    );
+
+    return {
+      message: 'Added as staff pick successfully',
+      data: result,
+    };
+  }
+
+  @Patch(':id/staff-pick')
+  @ApiOperation({ summary: 'Edit Staff Pick note / staff name' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.OK)
+  async updateStaffPick(
+    @Param('id') id: string,
+    @Body() updateStaffPickDto: UpdateStaffPickDto,
+  ) {
+    const result = await this.inventoryService.updateStaffPick(
+      id,
+      updateStaffPickDto,
+    );
+
+    return {
+      message: 'Staff pick updated successfully',
+      data: result,
+    };
+  }
+
+  @Delete(':id/staff-pick')
+  @ApiOperation({ summary: 'Remove Staff Pick' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('retailer'))
+  @HttpCode(HttpStatus.OK)
+  async removeStaffPick(@Param('id') id: string) {
+    const result = await this.inventoryService.removeStaffPick(id);
+
+    return {
+      message: 'Staff pick removed successfully',
       data: result,
     };
   }

@@ -80,6 +80,9 @@ export class Inventory {
   staffPickBy!: string;
   // "Mike"
 
+  @Prop()
+  staffPickAddedAt!: Date;
+
   @Prop({ default: false })
   isNewArrival!: boolean;
 
