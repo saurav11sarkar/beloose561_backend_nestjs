@@ -80,17 +80,40 @@ export class Inventory {
   staffPickBy!: string;
   // "Mike"
 
+  @Prop()
+  staffPickAddedAt!: Date;
+
   @Prop({ default: false })
   isNewArrival!: boolean;
 
   @Prop()
   arrivalDate!: Date;
 
+  @Prop()
+  newArrivalNote!: string;
+  // "Just arrived from Davidoff. Limited quantity available."
+
+  @Prop({ default: 30 })
+  autoRemoveDays!: number;
+  // 7 / 14 / 30 days
+
+  @Prop()
+  newArrivalExpiresAt!: Date;
+  // arrivalDate + autoRemoveDays, checked by the nightly cron
+
   @Prop({ default: false })
   isDailyFeatured!: boolean;
 
   @Prop()
   featuredNote!: string;
+
+  @Prop()
+  featuredDate!: Date;
+  // Day this item is/was "Today's Featured" for - cleared by the midnight cron
+
+  @Prop({ min: 0 })
+  featuredPrice!: number;
+  // Optional special price while featured (separate from a regular discount)
 
   // Status
   @Prop({
@@ -112,6 +135,19 @@ export class Inventory {
 
   @Prop()
   lastSoldDate!: Date;
+
+  // Inventory Opportunities - Discount
+  @Prop({ default: false })
+  isOnDiscount!: boolean;
+
+  @Prop({ min: 0, max: 100 })
+  discountPercentage!: number;
+
+  @Prop({ min: 0 })
+  discountPrice!: number;
+
+  @Prop()
+  discountedAt!: Date;
 }
 
 export const InventorySchema = SchemaFactory.createForClass(Inventory);
